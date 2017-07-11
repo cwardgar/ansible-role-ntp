@@ -2,6 +2,14 @@
 - name: Include OS-specific variables.
   include_vars: "{{ ansible_os_family }}.yml"
 
+- name: Ensure NTP-related packages are installed.
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - ntp
+    - tzdata
+
 - name: Set the correct timezone.
   file:
     src: "/usr/share/zoneinfo/{{ ntp_timezone }}"
@@ -16,9 +24,6 @@
     dest: /etc/timezone
     force: yes
   when: ansible_os_family == 'Debian'
-
-- name: Install NTP.
-  package: name=ntp state=present
 
 - name: Ensure NTP is running and enabled as configured.
   service:
